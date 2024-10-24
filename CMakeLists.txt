@@ -1,58 +1,31 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
 PROJECT(violetland)
 
 # CMake 3.2 is necessary in order to use FindIntl. If you want to compile
 # violetland on an older system (like plain Ubuntu 14.04) you can revert
 # da80351581f826f0f4c1c2f7b494ed51a6acec51 and it will work most likely down to
 # CMake 2.8.12
-CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules/sdl2)
-
-
 
 # SDL
-find_package(SDL2 REQUIRED)
-set(VIOLET_INCLUDE_DIRS	${VIOLET_INCLUDE_DIRS}	${SDL2_INCLUDE_DIR})
-set(VIOLET_LIBRARIES	${VIOLET_LIBRARIES}	${SDL2_LIBRARY})
-
-
-# SDL_image
-find_package(SDL2_image REQUIRED)
-set(VIOLET_INCLUDE_DIRS	${VIOLET_INCLUDE_DIRS}	${SDL2_IMAGE_INCLUDE_DIR})
-set(VIOLET_LIBRARIES	${VIOLET_LIBRARIES}	${SDL2_IMAGE_LIBRARY})
-
-
-# SDL_ttf
-find_package(SDL2_ttf REQUIRED)
-set(VIOLET_INCLUDE_DIRS	${VIOLET_INCLUDE_DIRS}	${SDL2_TTF_INCLUDE_DIR})
-set(VIOLET_LIBRARIES	${VIOLET_LIBRARIES}	${SDL2_TTF_LIBRARY})
-
-
-# SDL_mixer
-find_package(SDL2_mixer REQUIRED)
-set(VIOLET_INCLUDE_DIRS	${VIOLET_INCLUDE_DIRS}	${SDL2_MIXER_INCLUDE_DIR})
-set(VIOLET_LIBRARIES	${VIOLET_LIBRARIES}	${SDL2_MIXER_LIBRARY})
-
+find_package(SDL2       CONFIG REQUIRED)
+find_package(SDL2_ttf   CONFIG REQUIRED)
+find_package(SDL2_image CONFIG REQUIRED)
+find_package(SDL2_mixer CONFIG REQUIRED)
 
 # OpenGL
+set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
-set(VIOLET_INCLUDE_DIRS	${VIOLET_INCLUDE_DIRS}	${OPENGL_INCLUDE_DIR})
-set(VIOLET_LIBRARIES	${VIOLET_LIBRARIES}	${OPENGL_LIBRARIES})
-
 
 # Boost
-find_package(Boost COMPONENTS filesystem system REQUIRED)
+find_package(Boost CONFIG COMPONENTS filesystem system REQUIRED)
 set(VIOLET_INCLUDE_DIRS	${VIOLET_INCLUDE_DIRS}	${Boost_INCLUDE_DIRS})
 set(VIOLET_LIBRARIES	${VIOLET_LIBRARIES}	${Boost_LIBRARIES})
 add_definitions(-DBOOST_FILESYSTEM_VERSION=3)
-
 
 # Intl
 find_package(Intl REQUIRED)
 set(VIOLET_INCLUDE_DIRS	${VIOLET_INCLUDE_DIRS}	${Intl_INCLUDE_DIR})
 set(VIOLET_LIBRARIES	${VIOLET_LIBRARIES}	${Intl_LIBRARIES})
-
-
-
 
 
 # LOCALEDIR must be set up before including po/CMakeLists.txt
@@ -201,7 +174,15 @@ endif()
 # Build executable
 include_directories(${VIOLET_INCLUDE_DIRS})
 add_executable(violetland ${VIOLET_RESOURCES} ${VIOLET_SOURCES})
-target_link_libraries(violetland ${VIOLET_LIBRARIES})
+target_link_libraries(
+  violetland
+  ${VIOLET_LIBRARIES}
+  SDL2::SDL2
+  SDL2_image::SDL2_image
+  SDL2_mixer::SDL2_mixer
+  SDL2_ttf::SDL2_ttf
+  OpenGL::OpenGL
+)
 
 
 
